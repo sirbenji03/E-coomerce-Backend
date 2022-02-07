@@ -47,7 +47,6 @@ Product.init(
       },
     },
   },
-  },
   {
     sequelize,
     timestamps: false,
