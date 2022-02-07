@@ -7,16 +7,14 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
-  Product.findAll({
-    include: [{model: Category}, {model: Tag}],
-  })
-  .then(data => {
-    res.status(200).json(data)
-  })
-  .catch(err => {
-    console.log(err);
-    res.send('Request failed.')
-  })
+  try {
+    const productData = await Product.findAll({
+      include: [{ model: Category }, { model: Tag, through: ProductTag, as: 'tags_on_product' }]
+    });
+    res.status(200).json(productData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // get one product
@@ -117,7 +115,7 @@ router.delete('/:id', (req, res) => {
 
     .then(prodData => {
       if (!prodData) {
-        res.status(404).json({ message: 'There is no other product associated with this id!' });
+        res.status(404).json({ message: 'There is no other product found with this with this id!' });
         return;
       }
       res.json(prodData);
